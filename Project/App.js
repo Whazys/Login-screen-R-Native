@@ -1,4 +1,4 @@
-import React from 'react';
+import React, {useState, useEffect} from 'react';
 import {
   View,
   KeyboardAvoidingView,
@@ -7,16 +7,45 @@ import {
   TouchableOpacity,
   Text,
   StyleSheet,
+  Animated,
+  Keyboard,
 } from 'react-native';
 
 export default function App() {
+  const [offset] = useState(new Animated.ValueXY({x: 0, y: 95}));
+  const [opacity] = useState(new Animated.Value(0));
+  const [logo] = useState(new Animated.ValueXY({x: 130, y: 155}));
+  useEffect(() => {
+    Animated.parallel([
+      Animated.spring(offset.y, {
+        toValue: 0,
+        speed: 4,
+        bounciness: 30,
+      }),
+      Animated.timing(opacity, {
+        toValue: 1,
+        duration: 500,
+      }),
+    ]).start();
+  }, []);
+
   return (
     <KeyboardAvoidingView style={styles.background}>
       <View style={styles.containerLogo}>
-        <Image source={require('./src/assets/logo1.png')} />
+        <Animated.Image
+          style={{
+            width: logo.x,
+            height: logo.y,
+          }}
+          source={require('./src/assets/logo1.png')}
+        />
       </View>
 
-      <View style={styles.container}>
+      <Animated.View
+        style={[
+          styles.container,
+          {opacity: opacity, transform: [{translateY: offset.y}]},
+        ]}>
         <TextInput
           style={styles.input}
           placeholder="Email"
@@ -30,14 +59,14 @@ export default function App() {
           autoCorrect={false}
           onChangeText={() => {}}
         />
-      </View>
+      </Animated.View>
 
       <TouchableOpacity style={styles.btnSubmit}>
         <Text style={styles.submitText}>Acessar</Text>
       </TouchableOpacity>
 
       <TouchableOpacity style={styles.btnRegister}>
-        <Text style={styles.RegisterText}>Criar conta gratuita</Text>
+        <Text style={styles.registerText}>Criar conta gratuita</Text>
       </TouchableOpacity>
     </KeyboardAvoidingView>
   );
